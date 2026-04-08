@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center animate-slide-up">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-soft rounded-4 overflow-hidden">
+            <div class="card-header bg-dark text-white py-4 border-0">
+                <h4 class="fw-bold mb-0 text-center text-uppercase small tracking-widest"><i class="fa-solid fa-pen-to-square me-2 text-mint"></i>Modify Employee Record</h4>
+            </div>
+            <div class="card-body p-5">
+                <form method="POST" class="needs-validation" novalidate>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control rounded-3" id="name" name="name" value="{{ employee.name }}" required>
+                        <label for="name">Employee Full Name</label>
+                        <div class="invalid-feedback ps-2">Field cannot be empty.</div>
+                    </div>
+                    
+                    <div class="form-floating mb-3">
+                        <select class="form-select rounded-3" id="department" name="department" required>
+                            <option value="" disabled>Unit/Department Selection</option>
+                            {% for dept in ['Engineering', 'Human Resources', 'Marketing', 'Sales', 'Finance', 'IT Support', 'Customer Success'] %}
+                            <option value="{{ dept }}" {{ 'selected' if employee.department == dept else '' }}>{{ dept }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="department">Assigned Unit</label>
+                    </div>
+                    
+                    <div class="form-floating mb-4">
+                        <input type="number" step="0.01" class="form-control rounded-3" id="salary" name="salary" value="{{ employee.salary }}" required>
+                        <label for="salary">Monthly Renumeration (₹)</label>
+                        <div class="invalid-feedback ps-2">Enter a valid amount.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 pt-2">
+                        <button type="submit" class="btn btn-primary btn-gradient rounded-pill py-3 fw-bold shadow-sm">
+                            Commit Changes <i class="fa-solid fa-cloud-upload-alt ms-2"></i>
+                        </button>
+                        <a href="{{ url_for('view_employees') }}" class="btn btn-outline-secondary rounded-pill py-2 mt-2">
+                            Cancel Modifications
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Basic Bootstrap form validation
+(function () {
+  'use strict'
+  var forms = document.querySelectorAll('.needs-validation')
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+</script>
+{% endblock %}

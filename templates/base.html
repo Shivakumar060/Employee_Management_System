@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title if title else "ApexCorp Premium HR" }}</title>
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="transition-all">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top glass-navbar shadow-sm py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('dashboard') }}">
+                <div class="logo-circle me-3"><i class="fa-solid fa-crown"></i></div>
+                <span class="fw-bold fs-4">ApexCorp <span class="text-primary-gradient small fw-normal ms-1">HR PLATFORM</span></span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    {% if session.get('user_id') %}
+                        <li class="nav-item me-2">
+                            <a class="nav-link px-3 {{ 'active' if request.path == '/' }}" href="{{ url_for('dashboard') }}">Dashboard</a>
+                        </li>
+                        <li class="nav-item me-2">
+                            <a class="nav-link px-3 {{ 'active' if '/view' in request.path }}" href="{{ url_for('view_employees') }}">Directory</a>
+                        </li>
+                        {% if session.get('role') == 'admin' %}
+                        <li class="nav-item me-2">
+                            <a class="nav-link px-3 {{ 'active' if '/add' in request.path }}" href="{{ url_for('add_employee') }}">Add Employee</a>
+                        </li>
+                        {% endif %}
+
+                        <li class="nav-item me-2">
+                            <a class="nav-link px-3 {{ 'active' if '/leaves' in request.path }}" href="{{ url_for('manage_leaves') }}">Leaves</a>
+                        </li>
+                        {% if session.get('role') == 'admin' %}
+                            <li class="nav-item me-2">
+                                <a class="nav-link px-3 text-danger-emphasis" href="{{ url_for('view_logs') }}">System Logs</a>
+                            </li>
+                        {% endif %}
+                        
+                        <!-- Dark Mode Toggle -->
+                        <li class="nav-item mx-2">
+                            <button id="darkModeToggle" class="btn btn-icon rounded-circle shadow-inner">
+                                <i class="fa-solid fa-moon"></i>
+                            </button>
+                        </li>
+
+                        <!-- User Profile Dropdown -->
+                        <li class="nav-item dropdown ms-2">
+                            <a class="nav-link dropdown-toggle profile-dropdown-toggle bg-white-15 rounded-pill px-3 py-2 shadow-sm" href="#" data-bs-toggle="dropdown">
+                                <img src="https://ui-avatars.com/api/?name={{ session.get('username') }}&background=4e73df&color=fff" class="rounded-circle me-2" width="28">
+                                <span class="fw-medium">{{ session.get('username') }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-3 p-2 rounded-4 glass-dropdown animate-slide-down">
+                                <li><a class="dropdown-item rounded-3 py-2" href="{{ url_for('profile') }}"><i class="fa-solid fa-id-badge me-2 text-primary"></i>My Profile</a></li>
+                                <li><hr class="dropdown-divider mx-2"></li>
+                                <li><a class="dropdown-item text-danger rounded-3 py-2" href="{{ url_for('logout') }}"><i class="fa-solid fa-power-off me-2"></i>Sign Out</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item me-2"><a class="nav-link" href="{{ url_for('login') }}">Sign In</a></li>
+                        <li class="nav-item"><a class="btn btn-primary-gradient rounded-pill px-4 shadow-sm" href="{{ url_for('signup') }}">Join ApexCorp</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 1100">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="toast align-items-center text-white bg-{{ category }} border-0 shadow-lg rounded-4 mb-3 animate-slide-left" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex p-3">
+                  <div class="toast-body fw-medium">
+                    <i class="fa-solid fa-circle-{{ 'check' if category == 'success' else 'exclamation' }} me-2"></i> {{ message }}
+                  </div>
+                  <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
