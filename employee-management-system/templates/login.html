@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card glass-card border-0 shadow-lg rounded-5 animate-slide-up">
+            <div class="card-body p-5">
+                <div class="text-center mb-5">
+                    <div class="logo-circle mx-auto mb-4 scale-up-hover"><i class="fa-solid fa-lock-open"></i></div>
+                    <h3 class="fw-bold text-primary-gradient">Secure Access</h3>
+                    <p class="text-muted small">ApexCorp HR Intelligence Network</p>
+                </div>
+                <form method="POST" class="needs-validation" novalidate>
+                    <div class="form-floating mb-3 shadow-sm-inset glass-input rounded-4">
+                        <input type="text" class="form-control border-0 bg-transparent" id="username" name="username" placeholder="Username" required>
+                        <label for="username">Operator Username</label>
+                    </div>
+                    <div class="form-floating mb-4 shadow-sm-inset glass-input rounded-4">
+                        <input type="password" class="form-control border-0 bg-transparent" id="password" name="password" placeholder="Password" required>
+                        <label for="password">Encrypted Password</label>
+                    </div>
+                    <div class="d-grid mb-4">
+                        <button type="submit" class="btn btn-primary-gradient rounded-pill py-3 fw-bold shadow-md">Establish Connection</button>
+                    </div>
+                    <div class="text-center">
+                        <p class="mb-2 text-muted small">New Operator? <a href="{{ url_for('signup') }}" class="text-primary text-decoration-none fw-bold">Request Access</a></p>
+                        <a href="{{ url_for('reset_password') }}" class="text-muted small text-decoration-none">Lost clearance? <span class="text-primary">Reset Protocol</span></a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

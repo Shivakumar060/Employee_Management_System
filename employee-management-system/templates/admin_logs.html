@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-4 animate-slide-up">
+    <div class="col-md-12 mb-3">
+        <h2 class="fw-bold tracking-tight mb-0">System Activity <span class="text-danger fw-normal ms-2">Audit Logs</span></h2>
+        <p class="text-muted small">Access Level: <span class="badge bg-danger-subtle text-danger rounded-pill fw-medium border border-opacity-10">ADMIN OVERRIDE</span></p>
+    </div>
+
+    <div class="col-md-12">
+        <div class="card glass-card border-0 shadow-soft rounded-5 overflow-hidden">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-dark text-white border-0 py-4 px-4 sticky-top">
+                            <tr>
+                                <th class="py-4 px-4 text-uppercase small tracking-widest">ID Index</th>
+                                <th class="py-4 px-4 text-uppercase small tracking-widest">Operator Identity</th>
+                                <th class="py-4 px-4 text-uppercase small tracking-widest">System Intervention</th>
+                                <th class="py-4 px-4 text-uppercase small tracking-widest text-end">Temporal Index</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr class="log-row border-bottom border-light border-opacity-10 align-middle">
+                                <td class="py-3 px-4 fw-bold text-muted small font-mono">#{{ log.id }}</td>
+                                <td class="py-3 px-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm rounded-circle bg-primary-gradient text-white d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                            {{ log.username[0]|upper }}
+                                        </div>
+                                        <span class="fw-semibold text-dark">{{ log.username }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-muted">
+                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2 fw-medium border border-secondary border-opacity-10 shadow-sm-inset">
+                                        <i class="fa-solid fa-code-commit me-1 opacity-50"></i>{{ log.action }}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-end text-muted small font-mono">
+                                    <i class="fa-regular fa-clock me-1"></i> {{ log.timestamp }}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <div class="py-4">
+                                        <i class="fa-solid fa-database fs-2 mb-3 opacity-25"></i>
+                                        <p class="mb-0">System audit trails are currently empty.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-4 mb-5 animate-slide-up">
+    <div class="col-md-12 d-flex align-items-center justify-content-between mb-3 border-bottom pb-4 border-opacity-10 border-dark">
+        <div>
+            <h2 class="fw-bold tracking-tight mb-0">ApexCorp <span class="text-primary-gradient fw-normal ms-2">Operations Center</span></h2>
+            <p class="text-muted small mb-0">Sector Status: <span class="text-success-emphasis fw-bold">Optimum Intelligence</span></p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            {% if session.get('role') == 'user' %}
+                {% if not today_marked %}
+                    <form action="{{ url_for('mark_attendance') }}" method="POST">
+                        <button type="submit" class="btn btn-primary-gradient rounded-pill px-4 shadow-sm pulse-animation">
+                            <i class="fa-solid fa-clock-user me-2"></i>Mark Attendance
+                        </button>
+                    </form>
+                {% else %}
+                    <button class="btn btn-success-gradient rounded-pill px-4 shadow-sm" disabled>
+                        <i class="fa-solid fa-check-double me-2"></i>Status: Present
+                    </button>
+                {% endif %}
+            {% else %}
+                <div class="btn-group shadow-sm rounded-pill overflow-hidden">
+                    <a href="{{ url_for('export_csv') }}" class="btn btn-glass-dark px-3 py-2"><i class="fa-solid fa-file-csv me-2 text-info"></i>CSV</a>
+                    <a href="{{ url_for('export_pdf') }}" class="btn btn-glass-dark px-3 py-2"><i class="fa-solid fa-file-pdf me-2 text-danger"></i>PDF</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Analytics Section for Admin -->
+    {% if session.get('role') == 'admin' %}
+    <div class="col-md-8">
+        <div class="card glass-card border-0 shadow-soft h-100 rounded-5 p-4 overflow-hidden position-relative animate-slide-up">
+            <h5 class="fw-bold mb-4 text-primary-gradient"><i class="fa-solid fa-chart-line me-2"></i>Dept. Distribution</h5>
+            <canvas id="deptChart" height="200"></canvas>
+            <div class="card-flare-top opacity-50"></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card glass-card border-0 shadow-soft h-100 rounded-5 p-4 animate-slide-up delay-1">
+            <h5 class="fw-bold mb-4 text-accent-gradient"><i class="fa-solid fa-magnifying-glass-chart me-2"></i>Salary Bracket</h5>
+            <canvas id="salaryChart" height="200"></canvas>
+        </div>
+    </div>
+    {% else %}
+    <!-- User Dashboard Widget -->
+    <div class="col-md-12">
+        <div class="card glass-card border-0 shadow-soft rounded-5 p-5 animate-slide-up text-center bg-primary-gradient text-white">
+            <h2 class="fw-bold mb-2">Welcome back, {{ session.get('username') }}</h2>
+            <p class="fs-5 opacity-75 mb-4">You have successfully logged into the ApexCorp Secure Network.</p>
+            <div class="d-flex justify-content-center gap-4">
+                <div class="text-center">
+                    <h1 class="fw-bold mb-0">Active</h1>
+                    <span class="small uppercase opacity-50">Portal Status</span>
+                </div>
+                <div class="vr opacity-25 mx-3"></div>
+                <div class="text-center">
+                    <h1 class="fw-bold mb-0">Protected</h1>
+                    <span class="small uppercase opacity-50">Connection Type</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Common Stats Row -->
+    <div class="col-md-3">
+        <div class="card glass-card border-0 shadow-soft rounded-4 p-4 animate-slide-up delay-2">
+            <h6 class="text-muted small uppercase fw-bold mb-2">Workforce Size</h6>
+            <h2 class="display-6 fw-bold text-primary mb-0">{{ total_employees }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card glass-card border-0 shadow-soft rounded-4 p-4 animate-slide-up delay-3">
+            <h6 class="text-muted small uppercase fw-bold mb-2">Active Units</h6>
+            <h2 class="display-6 fw-bold text-mint mb-0">{{ total_depts }}</h2>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card glass-card border-0 shadow-soft rounded-4 p-4 animate-slide-up delay-4">
+            <h6 class="text-muted small uppercase fw-bold mb-2">Avg monthly Remuneration (INR)</h6>
+            <h2 class="display-6 fw-bold text-accent mb-0">₹{{ "{:,.2f}".format(avg_salary) }}</h2>
+        </div>
+    </div>
+
+    <!-- System Logs / Recent Activity (Admin) -->
+    {% if session.get('role') == 'admin' %}
+    <div class="col-md-12 mt-4">
+        <div class="card glass-card border-0 shadow-soft rounded-5 p-4 animate-slide-up delay-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-list-check me-2 text-danger"></i>System Activity Logs</h5>
+                <a href="{{ url_for('view_logs') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">Full History</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light-subtle text-muted small uppercase tracking-widest">
+                        <tr>
+                            <th class="py-3 px-4">Operator</th>
+                            <th class="py-3 px-4">Intervention</th>
+                            <th class="py-3 px-4 text-end">Temporal Index</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr class="log-row">
+                            <td class="py-3 px-4 fw-medium text-dark"><i class="fa-solid fa-user-shield me-2 text-primary opacity-50"></i>{{ log.username }}</td>
+                            <td class="py-3 px-4 text-muted"><span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2 fw-medium border border-secondary border-opacity-10">{{ log.action }}</span></td>
+                            <td class="py-3 px-4 text-end text-muted small font-mono">{{ log.timestamp }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DEBUG: Initializing Dashboard Charts...");
+
+    // Department Distribution Chart
+    fetch('/api/stats/dept')
+        .then(res => {
+            console.log("DEBUG: Dept API Status:", res.status);
+            return res.json();
+        })
+        .then(data => {
+            console.log("DEBUG: Dept Data received:", data);
+            if (Object.keys(data).length === 0) {
+                console.warn("DEBUG: No department data found.");
+                return;
+            }
+            new Chart(document.getElementById('deptChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data),
+                    datasets: [{
+                        label: 'Team Members',
+                        data: Object.values(data),
+                        backgroundColor: '#4e73df88',
+                        borderColor: '#4e73df',
+                        borderWidth: 2,
+                        borderRadius: 15
+                    }]
+                },
+                options: { 
+                    responsive: true,
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { grid: { display: false } } }
+                }
+            });
+        })
+        .catch(err => console.error("ERROR fetching dept stats:", err));
+
+    // Salary Bracket Chart
+    fetch('/api/stats/salary')
+        .then(res => {
+            console.log("DEBUG: Salary API Status:", res.status);
+            return res.json();
+        })
+        .then(data => {
+            console.log("DEBUG: Salary data received:", data);
+            new Chart(document.getElementById('salaryChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(data),
+                    datasets: [{
+                        data: Object.values(data),
+                        backgroundColor: ['#e74a3b', '#f6c23e', '#1cc88a'],
+                        borderColor: 'transparent'
+                    }]
+                },
+                options: { 
+                    cutout: '70%', 
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        })
+        .catch(err => console.error("ERROR fetching salary stats:", err));
+});
+
+</script>
+{% endblock %}

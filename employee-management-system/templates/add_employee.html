@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center animate-slide-up">
+    <div class="col-md-6">
+        <div class="card glass-card border-0 shadow-lg rounded-5 overflow-hidden">
+            <div class="card-header bg-dark text-white py-4 border-0 shadow-sm text-center">
+                <h5 class="fw-bold mb-0 text-uppercase tracking-widest small"><i class="fa-solid fa-user-plus me-2 text-mint"></i>New Identity Enrolment</h5>
+            </div>
+            <div class="card-body p-5">
+                <form method="POST" class="needs-validation" novalidate id="addForm">
+                    <div class="form-floating mb-3 shadow-sm-inset glass-input rounded-4">
+                        <input type="text" class="form-control border-0 bg-transparent" id="name" name="name" required placeholder="Full Name">
+                        <label for="name">Legal Entity Name</label>
+                    </div>
+                    
+                    <div class="form-floating mb-3 shadow-sm-inset glass-input rounded-4">
+                        <select class="form-select border-0 bg-transparent" id="department" name="department" required>
+                            <option value="" selected disabled>Unit Selection...</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Human Resources">Human Resources</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Finance">Finance</option>
+                            <option value="IT Support">IT Support</option>
+                            <option value="Customer Success">Customer Success</option>
+                        </select>
+                        <label for="department">Assigned Sector</label>
+                    </div>
+                    
+                    <div class="form-floating mb-4 shadow-sm-inset glass-input rounded-4">
+                        <input type="number" step="0.01" class="form-control border-0 bg-transparent" id="salary" name="salary" required placeholder="0.00">
+                        <label for="salary">Monthly Renumeration (₹)</label>
+                    </div>
+                    
+                    <div class="d-grid gap-2 pt-2">
+                        <button type="submit" class="btn btn-primary-gradient rounded-pill py-3 fw-bold shadow-md">Establish Record <i class="fa-solid fa-arrow-right ms-2 animate-bounce-right"></i></button>
+                        <a href="{{ url_for('view_employees') }}" class="btn btn-outline-secondary rounded-pill py-2 mt-2">Abort Registration</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Basic Bootstrap form validation
+(function () {
+  'use strict'
+  var forms = document.querySelectorAll('.needs-validation')
+  Array.prototype.slice.call(forms)
+    .forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+})()
+</script>
+{% endblock %}

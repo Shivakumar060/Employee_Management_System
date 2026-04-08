@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-4 animate-slide-up">
+    <div class="col-md-12 mb-3">
+        <h2 class="fw-bold tracking-tight mb-0">Leave <span class="text-primary-gradient fw-normal ms-2">Management</span></h2>
+        <p class="text-muted small">Access Status: <span class="badge bg-secondary-subtle text-secondary rounded-pill fw-medium border border-opacity-10">{{ session.get('role')|upper }} Mode</span></p>
+    </div>
+
+    {% if session.get('role') == 'user' %}
+    <!-- Apply for Leave Form (User Only) -->
+    <div class="col-md-4">
+        <div class="card glass-card border-0 shadow-soft rounded-5 p-4 animate-slide-left">
+            <h5 class="fw-bold mb-4 text-primary-gradient"><i class="fa-solid fa-file-signature me-2"></i>Apply for Leave</h5>
+            <form action="{{ url_for('manage_leaves') }}" method="POST" class="needs-validation" novalidate>
+                <div class="form-floating mb-3">
+                    <textarea class="form-control rounded-4" id="reason" name="reason" placeholder="Reason" required style="height: 100px"></textarea>
+                    <label for="reason">Reason for Absence</label>
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="form-floating">
+                            <input type="date" class="form-control rounded-4" id="start_date" name="start_date" required>
+                            <label for="start_date">Start Date</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating">
+                            <input type="date" class="form-control rounded-4" id="end_date" name="end_date" required>
+                            <label for="end_date">End Date</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-grid pt-2">
+                    <button type="submit" class="btn btn-primary-gradient rounded-pill py-3 fw-bold shadow-sm">Submit Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Leave History / Approval Table -->
+    <div class="col-md-{{ '8' if session.get('role') == 'user' else '12' }}">
+        <div class="card glass-card border-0 shadow-soft rounded-5 overflow-hidden animate-slide-up delay-1">
+            <div class="card-header bg-dark text-white border-0 py-4 px-4 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-check me-2"></i>{{ 'User Applications' if session.get('role') == 'admin' else 'My Request History' }}</h5>
+                <span class="badge bg-white-20 rounded-pill px-3 py-2 fw-medium border border-opacity-10 border-white font-mono">{{ leaves|length }} RECORDS</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light-subtle text-muted small uppercase tracking-widest">
+                        <tr>
+                            {% if session.get('role') == 'admin' %}
+                            <th class="py-3 px-4">Employee</th>
+                            {% endif %}
+                            <th class="py-3 px-4">Reason</th>
+                            <th class="py-3 px-4">Duration</th>
+                            <th class="py-3 px-4">Status</th>
+                            {% if session.get('role') == 'admin' %}
+                            <th class="py-3 px-4 text-end">Administrative Control</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for leave in leaves %}
+                        <tr class="leave-row border-bottom border-light border-opacity-10">
+                            {% if session.get('role') == 'admin' %}
+                            <td class="py-3 px-4 fw-bold text-dark"><i class="fa-solid fa-user-circle me-2 opacity-50"></i>{{ leave.username }}</td>
+                            {% endif %}
+                            <td class="py-3 px-4">
+                                <span class="d-inline-block text-truncate" style="max-width: 200px;" title="{{ leave.reason }}">
+                                    {{ leave.reason }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-muted small font-mono">
+                                <i class="fa-regular fa-clock me-1"></i> {{ leave.start_date }} <span class="mx-1">→</span> {{ leave.end_date }}
+                            </td>
+                            <td class="py-3 px-4">
+                                {% if leave.status == 'Pending' %}
+                                    <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-3 py-2 border border-warning border-opacity-10 shadow-sm-inset animate-pulse-slow">
+                                        <i class="fa-solid fa-hourglass-half me-1"></i>Pending Review
+                                    </span>
+                                {% elif leave.status == 'Approved' %}
+                                    <span class="badge bg-success-subtle text-success-emphasis rounded-pill px-3 py-2 border border-success border-opacity-10 shadow-sm-inset">
+                                        <i class="fa-solid fa-circle-check me-1"></i>Approved Ready
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill px-3 py-2 border border-danger border-opacity-10 shadow-sm-inset">
+                                        <i class="fa-solid fa-circle-xmark me-1"></i>Record Rejected
+                                    </span>
+                                {% endif %}
+                            </td>
+                            {% if session.get('role') == 'admin' %}
+                            <td class="py-3 px-4 text-end">
+                                {% if leave.status == 'Pending' %}
+                                <div class="btn-group shadow-sm-inset rounded-pill overflow-hidden">
+                                    <a href="{{ url_for('process_leave', action='approve', id=leave.id) }}" class="btn btn-sm btn-white px-3 py-2 border-end" title="Authorize">
+                                        <i class="fa-solid fa-check text-success"></i>
+                                    </a>
+                                    <a href="{{ url_for('process_leave', action='reject', id=leave.id) }}" class="btn btn-sm btn-white px-3 py-2" title="Decline">
+                                        <i class="fa-solid fa-xmark text-danger"></i>
+                                    </a>
+                                </div>
+                                {% else %}
+                                <span class="small text-muted font-italic opacity-50"><i class="fa-solid fa-lock-open me-2"></i>Processed</span>
+                                {% endif %}
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="{{ '5' if session.get('role') == 'admin' else '4' }}" class="text-center py-5 text-muted opacity-50">
+                                <i class="fa-solid fa-calendar-alt fs-2 mb-3"></i>
+                                <p class="mb-0">Queue is currently inactive.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
