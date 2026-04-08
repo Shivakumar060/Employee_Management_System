@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center animate-slide-up">
+    <div class="col-md-5">
+        <div class="card glass-card border-0 shadow-lg rounded-5 overflow-hidden text-center">
+            <div class="card-header bg-dark-gradient py-5 border-0 position-relative">
+                <div class="avatar-lg bg-mint-subtle text-mint mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle shadow-lg pulse-animation" style="width: 120px; height: 120px; font-size: 4rem; font-weight: 700; border: 4px solid white;">
+                    {{ session.get('username')[0]|upper }}
+                </div>
+                <h3 class="text-white fw-bold mb-0 tracking-tight">{{ session.get('username') }}</h3>
+                <span class="badge bg-mint text-dark-mint px-4 py-2 rounded-pill mt-2 uppercase shadow-sm">Active {{ session.get('role') }}</span>
+                <div class="card-flare-top opacity-50"></div>
+            </div>
+            <div class="card-body p-5 bg-white">
+                <div class="row g-4 mb-5">
+                    <div class="col-6">
+                        <div class="p-3 bg-primary-subtle rounded-4 shadow-sm-inset h-100">
+                            <h2 class="fw-bold text-primary mb-0">{{ attendance_count }}</h2>
+                            <p class="text-muted small mb-0 uppercase">Attendances</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 bg-success-subtle rounded-4 shadow-sm-inset h-100">
+                            <h2 class="fw-bold text-success mb-0">{{ (leave_status|selectattr("status", "equalto", "Approved")|list|length) }}</h2>
+                            <p class="text-muted small mb-0 uppercase">Approved Leaves</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold mb-4 text-start uppercase tracking-widest text-muted small border-bottom pb-2 border-opacity-10">Application Summary</h6>
+                <div class="text-start">
+                    {% for status in leave_status %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="small text-dark fw-medium">
+                            <i class="fa-solid fa-circle {{ 'text-warning' if status.status == 'Pending' else 'text-success' if status.status == 'Approved' else 'text-danger' }} me-2 fs-6 opacity-50"></i>
+                            {{ status.status }}
+                        </span>
+                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3">{{ status.count }} Record(s)</span>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-muted py-3 small opacity-50">No leave applications found.</p>
+                    {% endfor %}
+                </div>
+
+                <div class="d-grid mt-5">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary-gradient rounded-pill py-3 fw-bold shadow-sm">Return Home</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger border-0 rounded-pill py-2 mt-2 small opacity-75">Sign Out Permanently</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
